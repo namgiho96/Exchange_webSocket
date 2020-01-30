@@ -1,10 +1,7 @@
 const WebSocket = require('ws');
-const asyncRedis = require('async-redis');
-
 const ws = new WebSocket('wss://www.bitmex.com/realtime');
-const config = require('./config/env');
 
-const client = asyncRedis.createClient(config.development.redis.test_socket);
+const redisCrtl = require('./model/redisIndex');
 
 ws.on('open', async (data) =>{
     await ws.send(JSON.stringify({
@@ -18,7 +15,7 @@ ws.on('message', async (data)=>{
         const bitMexData = JSON.parse(data);
         switch (bitMexData.table) {
             case 'trade' :
-                await client.hset(`marketData:${bitMexData.data[0].symbol}`, 'currentPrice', bitMexData.data[0].price);
+                await redisCrtl.calcPrice(bitMexData.data[0].symbol,bitMexData.data[0].price);
                 break;
             case 'instrument' :
                 let marketData = bitMexData.data[0];
@@ -31,7 +28,7 @@ ws.on('message', async (data)=>{
                     keyValueArray.push(key);
                     keyValueArray.push(value);
                 }
-                await client.hset(`marketData:${bitMexData.data[0].symbol}`, keyValueArray);
+                await redisCrtl.calcMarketData(bitMexData.data[0].symbol,keyValueArray);
                 break;
         }
     }catch (e) {
