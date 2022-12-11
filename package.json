@@ -12,7 +12,7 @@
   "dependencies": {
     "async-redis": "^1.1.7",
     "bitmex-realtime-api": "^0.4.3",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "mongodb": "^3.5.2",
     "mongoose": "^5.8.9",
     "socket.io": "^2.3.0",
